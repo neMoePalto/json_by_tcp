@@ -1,6 +1,4 @@
 bin/
 build/
-Makefile
-*.pro.*
-.qmake.stash
-*/build
+*.user
+config/
