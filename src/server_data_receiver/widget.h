@@ -1,93 +1,94 @@
-#ifndef WIDGET_H
-#define WIDGET_H
-#include <QWidget>
-#include <QList>
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QLabel>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QTableWidget>
+#pragma once
+
+#include <map>
 #include <memory>
+
+#include <QGridLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QList>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QTextEdit>
+#include <QWidget>
+
+#include "../shared/structs/dataheader.h"
 #include "parsers/abstractparsersignalsslots.h"
-#include "structs/dataheader.h"
 
-namespace MySpace {
-const int a = 4;
-const char b = 'b';
-}
 
-enum class ClearLabelsPolicy
-{
-    All,
-    ExceptFirst
+enum class ClearLabelsPolicy {
+  All,
+  ExceptFirst
 };
 
 
-template<typename S, typename PFamily>
-class ParsersManager;
+template<typename S, typename PFamily> class ParsersManager;
 class AbstractParser;
 class AbstractP;
 class DataHandler;
 class TcpServer;
 class QTime;
-class Widget :
-        public QWidget,
-        public std::enable_shared_from_this<Widget>
-{
-    Q_OBJECT
-public:
-    Widget();
-    ~Widget() override;
-    using ptrFnProcessing = void(Widget::*)(QByteArray ba);
-signals:
-    void quitFromApp();
-public slots:
-    void processMsg(std::vector<char> &data, ushort portFrom);
-    void slotStartServer();
-    void slotCliConnected(quint16 port);
-    void slotCliDisconnected(quint16 port);
-    void slotPortIsBusy();
-    void showServPort(quint16 port);
-    void printParsingResults(MessageParsingResult info);
-private slots:
-    void slotStopServer();
-    void clearOutput();
+
+class Widget : public QWidget,
+               public std::enable_shared_from_this<Widget> {
+  Q_OBJECT
+
 private:
-    using TcpPort = ushort;
-    using Header = DataHeader;
-//    using Header = EmptyHeader;
-    using PFamily = AbstractParser;
-//    using PFamily = AbstractP;
-    using ShPtrParser = std::shared_ptr<ParsersManager<Header, PFamily>>;
-    std::map<TcpPort, ShPtrParser> _parsers{};
-    std::unique_ptr<TcpServer> _server;
-    std::unique_ptr<DataHandler> _dataHandler;
+  using TcpPort = unsigned short;
+  using Header  = DataHeader;
+  using PFamily = AbstractParser;
+//  using PFamily = AbstractP;
+//  using Header = EmptyHeader;
+//  using ptrFnProcessing = void(Widget::*)(QByteArray ba);
 
-    // GUI:
-    QTableWidget* _tableStatistics;
-    QTextEdit*  _teStatistics;
-    QTextEdit*  _teErrors;
-    std::unique_ptr<QTime> _time;
-    QLineEdit*  _lePort;
-    QLabel*     _lbCurrentPort;
-    QPushButton* _pbStart;
-    QPushButton* _pbConnectionStatus;
-    QPushButton* _pbClearOutput;
-    QPalette    *_green0, *_red0, *_green1,
-                *_red1, *_gray0, *_yellow0;
-    // ---------------------------------------
-    // TODO: Подумать над названием метода. Также: внутри метода
-    // используется инф. о номере ряда, в который добавляются
-    // данные. Это нехорошо.
-    void addDataItemToRow(int column, const QVariant &data);
+public:
+  Widget();
+  ~Widget();
 
-    void clearLabels(ClearLabelsPolicy fl = ClearLabelsPolicy::All);
-    void printTimeAndSizeInfo(ulong msgSize);
-    void printJsonObjAmount(ulong size);
-    ShPtrParser getParser(TcpPort port);
-    void showEvent(QShowEvent* /*event*/) override;
+  void processMsg(std::vector<char>& data, TcpPort remoteCliPort);
+  void slotStartServer();
+  void slotCliConnected(quint16 port);
+  void slotCliDisconnected(quint16 port);
+  void slotPortIsBusy();
+  void showServPort(quint16 port);
+  void printParsingResults(MessageParsingResult info);
+
+signals:
+  void quitFromApp();
+
+private:
+  void slotStopServer();
+  void clearOutput();
+
+  // TODO: Подумать над названием метода. Также: внутри метода используется
+  // инф. о номере ряда, в который добавляются данные. Это нехорошо.
+  void addDataItemToRow(int column, const QVariant &data);
+
+  void clearLabels(ClearLabelsPolicy fl = ClearLabelsPolicy::All);
+  void printJsonObjAmount(std::size_t amount) const noexcept;
+  void printTimeAndSizeInfo(std::size_t msgSize) const noexcept;
+  ParsersManager<Header, PFamily>* parserManagerForConnecton(TcpPort port);
+  void showEvent(QShowEvent* /*event*/) override;
+
+private:
+  std::map<TcpPort, std::shared_ptr<ParsersManager<Header, PFamily>>> _parserManagers;
+  std::unique_ptr<TcpServer>   _server;
+  std::unique_ptr<DataHandler> _dataHandler;
+
+  // ----------- GUI -----------:
+  QTableWidget* _tableStatistics;
+  QTextEdit*    _teStatistics;
+  QTextEdit*    _teErrors;
+  QLineEdit*    _lePort;
+  QLabel*       _lbCurrentPort;
+  QPushButton*  _pbStart;
+  QPushButton*  _pbConnectionStatus;
+  QPushButton*  _pbClearOutput;
+
+  const QPalette _green0  = Qt::green;
+  const QPalette _red0    = Qt::red;
+  const QPalette _green1  = QPalette(QColor(110,140,60));
+  const QPalette _red1    = QColor(200,110,70);
+  const QPalette _gray0   = Qt::gray;
+  const QPalette _yellow0 = Qt::yellow;
 };
-
-#endif // WIDGET_H
-

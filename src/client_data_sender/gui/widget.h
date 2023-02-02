@@ -4,7 +4,7 @@
 #include <QLineEdit>
 #include <boost/property_tree/ptree.hpp>
 #include <memory>
-#include "somestruct.h"
+#include "../shared/structs/somestruct.h"
 
 using namespace boost::property_tree;
 class QTextEdit;

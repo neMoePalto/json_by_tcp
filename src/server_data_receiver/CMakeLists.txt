@@ -1,6 +1,9 @@
 project(server_data_receiver VERSION 0.1 LANGUAGES CXX)
 
 set(sources
+  ../shared/structs/dataheader.h
+  ../shared/structs/somestruct.h
+  ../shared/structs/struct001.h
   all_struct_parser/abstractp.h
   all_struct_parser/datahandler.h
   all_struct_parser/datahandler_imlp.h
@@ -20,20 +23,11 @@ set(sources
   parsers/structparser_impl.h
   parsersmanager.h
   parsersmanager_impl.h
-  structs/dataheader.h
-  structs/somestruct.h
-  structs/struct001.h
   tcpserver.cpp
   tcpserver.h
   widget.cpp
   widget.h
 )
-
-# todo: Как это выразить в cmake-syntax:
-#DISTFILES += \
-#    json_files/network.json \
-#    json_files/network_agent.json \
-#    json_files/some_struct.json
 
 qt_add_executable(server_data_receiver
   ${sources}

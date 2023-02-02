@@ -1,17 +1,16 @@
+#include <memory>
+
 #include <QApplication>
-#include <QTimer>
+
 #include "widget.h"
 
 
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
+int main(int argc, char *argv[]) {
+  QApplication a(argc, argv);
 
-    auto w = std::make_shared<Widget>();
-    QObject::connect(w.get(), &Widget::quitFromApp,
-                     QCoreApplication::quit);
-    QTimer::singleShot(0, w.get(), &Widget::slotStartServer);
-    w->show();
+  auto w = std::make_shared<Widget>();
+  QObject::connect(w.get(), &Widget::quitFromApp, &QCoreApplication::quit);
+  w->show();
 
-    return app.exec();
+  return a.exec();
 }

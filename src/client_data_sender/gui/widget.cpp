@@ -13,7 +13,7 @@
 #include "gui/netsettingsdialog.h"
 #include "tcpsmartclient.h"
 #include "averagetime.h"
-#include "somestruct.h"
+#include "../shared/structs/somestruct.h"
 
 Widget::Widget()
 {
