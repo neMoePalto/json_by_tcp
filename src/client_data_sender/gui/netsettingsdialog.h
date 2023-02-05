@@ -1,34 +1,31 @@
-#ifndef NETSETTINGSDIALOG_H
-#define NETSETTINGSDIALOG_H
-#include <QDialog>
+#pragma once
 
-class QLabel;
+#include <memory>
+
+#include <QDialog>
+#include <QString>
+
+
 class QLineEdit;
-class QGridLayout;
 class QSettings;
 class Widget;
-class NetSettingsDialog : public QDialog
-{
-    Q_OBJECT
+
+class NetSettingsDialog : public QDialog {
+  Q_OBJECT
+
 public:
-    NetSettingsDialog(Widget* wgt);
-    ~NetSettingsDialog();
-    ushort  port() const;
-    QString ip() const;
+  NetSettingsDialog(Widget* parent);
+  ~NetSettingsDialog();
+  unsigned short port() const noexcept;
+  QString ip() const noexcept;
+
 private:
-    QGridLayout* _grid2;
-    QLabel*      _lb2;
-    QLabel*      _lbIp;
-    QLabel*      _lbPort;
-    QLineEdit*   _leIp;
-    QLineEdit*   _lePort;
-    QPushButton* _pbApplySettings;
-    QFont* _notoSans11; // Font from common widget
+  void loadSettings(QLineEdit& leForIp, QLineEdit& leForPort);
 
-    Widget*    _widget;
-    QSettings* _settings;
+private:
+  QLineEdit*   _leIp;
+  QLineEdit*   _lePort;
+  Widget*      _widget;
 
-    void usePreviousSettings(QLineEdit* leForIp, QLineEdit* leForPort);
+  std::unique_ptr<QSettings> _settings;
 };
-
-#endif // NETSETTINGSDIALOG_H

@@ -89,14 +89,15 @@ void TcpServer::slotNewConnection() {
 
 
 void TcpServer::slotRead() {
-  auto cliSocket = dynamic_cast<QTcpSocket*>(this->sender());
+  auto* cliSocket = dynamic_cast<QTcpSocket*>(this->sender());
+  assert(cliSocket);
+
   QDataStream in(cliSocket);
   in.setVersion(QDataStream::Qt_5_7);
   auto len = static_cast<std::size_t>(cliSocket->bytesAvailable());
 
   _buff.resize(len);
-  // Явно уменьшаю len до размера int. Проблем не возникает:
-  in.readRawData(_buff.data(), static_cast<int>(len));
+  in.readRawData(_buff.data(), len);
   emit haveData(_buff, cliSocket->peerPort());
 }
 

@@ -1,60 +1,59 @@
-#ifndef WIDGET_H
-#define WIDGET_H
-#include <QWidget>
-#include <QLineEdit>
-#include <boost/property_tree/ptree.hpp>
+#pragma once
+
+#include <map>
 #include <memory>
+#include <string>
+
+#include <boost/property_tree/ptree.hpp>
+
+#include <QString>
+#include <QWidget>
+
 #include "../shared/structs/somestruct.h"
 
+
 using namespace boost::property_tree;
+
+class QLineEdit;
 class QTextEdit;
-class QPushButton;
-class TcpSmartClient;
-class AverageTime;
 class NetSettingsDialog;
-class Widget : public QWidget
-{
-    Q_OBJECT
+class TcpSmartClient;
+
+class Widget : public QWidget {
+  Q_OBJECT
+
 public:
-    Widget();
-    ~Widget();
-public slots:
-    void slotClientRestart();
-private slots:
-    void sendJsonData();
-    void sendStructData();
-    void slotConnected();
-    void slotOpenSettingsWidget();
+  Widget();
+  ~Widget();
+  void slotClientRestart();
+
 private:
-    std::unique_ptr<TcpSmartClient> _smartClient;
-    QPushButton*    _pbSendJson;
-    QPushButton*    _pbSendStruct;
-    QPushButton*    _pbOpenSettingsWidget;
-    QTextEdit*      _teSendingResult;
-    QLineEdit*      _leObjAmount;
-    QFont* _notoSans11;
+  enum class DataType {
+    Json,
+    Struct
+  };
 
-    NetSettingsDialog* _settingsWidget;
-    const ushort    _prefix  = 0x1002;
-    const ushort    _postfix = 0x1003;
-    std::string _prefixStr{};
-    std::string _postfixStr{};
-    enum class DataType
-    {
-        Json,
-        Struct
-    };
-    using TypeInfo = std::tuple<std::string, QString>;
-    std::map<DataType, TypeInfo> _types;
-    const uint      _jsonObjAmount = 1;
-    AverageTime*    _sendingTimer;
+  void sendStructData();
+  void sendJsonData();
+  ptree jsonFromFile(const std::string& fileName) const;
+  void initHeaderParts() noexcept;
+  void updateGui(qint64 dataSize, DataType type);
 
-    ptree jsonFromFile(const std::string& fileName) const;
-    void updateGui(qint64 dataSize, DataType type);
-    void initHeaderParts();
-    void addTestData(SomeStruct& mySturct);
-    template<typename T>
-    std::string convertLen(T len) const;
+  template<typename T>
+  std::string convertLen(T len) const;
+  void addTestData(SomeStruct& mySturct) noexcept;
+
+private:
+  std::unique_ptr<TcpSmartClient>    _smartClient;
+  NetSettingsDialog*                 _settingsWidget;
+  QTextEdit*                         _teSendingResult;
+  QLineEdit*                         _leObjAmount;
+  const QString                      _defaultObjAmount = "1";
+
+  using TypeInfo = std::tuple<std::string, QString>;
+  const std::map<DataType, TypeInfo> _types;
+  const unsigned short               _prefix  = 0x1002;
+  const unsigned short               _postfix = 0x1003;
+  std::string                        _prefixStr;
+  std::string                        _postfixStr;
 };
-
-#endif // WIDGET_H

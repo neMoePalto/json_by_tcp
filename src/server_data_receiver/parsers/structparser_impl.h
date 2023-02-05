@@ -90,9 +90,6 @@ void StructParser<T>::readBlocks(std::string &&data) {
                                  _structObjects.size(),
                                  wholeMessageTime,
                                  objAverageTime});
-    qDebug() << "-- _totalLen = " << _totalLen;
-    qDebug() << "-- Structs amount = " << _structObjects.size();
-
     if (!data.empty()) {
       _parserManager.lock()->readMsgFromBeginning(std::move(data));
     }

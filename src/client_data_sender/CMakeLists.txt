@@ -2,8 +2,6 @@ project(client_data_sender VERSION 0.1 LANGUAGES CXX)
 
 set(sources
   ../shared/structs/somestruct.h
-  averagetime.cpp
-  averagetime.h
   gui/netsettingsdialog.cpp
   gui/netsettingsdialog.h
   gui/widget.cpp
